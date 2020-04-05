@@ -1,13 +1,11 @@
-# 2nd-place-solution-Cat2 [xDeepFM Yes!]  
-- https://arxiv.org/abs/1803.05170
-
+# 2nd-Place-solution [xDeepFM Yes!]
 Thanks to the organizers of the Categorical Feature Encoding Challenge II competition, and to the generous sharing and discussion between the kagglers, which helped me a lot.
 I will try to describe my entire competition process:   
 
-### Start & early attempts    
-When I first participated in this competition, I saw many participants said that simple LogisticRegression works well, so I used the sklearn.linear_model.LogisticRegression model, used *hyperopt* for hyperparameter search, and then trained the model in 40-fold As a baseline. Later tried catboost, but the effect was not good. I found that in the data set, the discrete classification features accounted for a large proportion, because I was used Wide & deep and DeepFM in other competitions, so I think to use some deep learning for CTR may have better results, and it turned out to be a correct choice.   
+###Start & early attempts  
+When I first participated in this competition, I saw many participants said that simple LogisticRegression works well, so I used the sklearn.linear_model.LogisticRegression model, used hyperopt for hyperparameter search, and then trained the model in 40-fold As a baseline. Later tried catboost, but the effect was not good. I found that in the data set, the discrete classification features accounted for a large proportion, because I was used Wide & deep and DeepFM in other competitions, so I think to use some deep learning for CTR may have better results, and it turned out to be a correct choice.   
 
-### Try CTR   
+### Try CTR:   
 Part of the training process I used *deepctr* package, source:   
 - https://github.com/shenweichen/DeepCTR   
 You can install it using **pip install deepctr**   
@@ -34,7 +32,7 @@ After that, I tried a variety of CTR models.If there is no special instruction, 
 
 The reason why I do not use the Deep and linear component in CIN and Cross is because I want to see the performance of these two modules separately, and because I want to stacking the models that perform well in the future, and stacking prefers excellent and Different models.   
 
-It can be seen that CIN performs best on the training set. After I submitted these result to the LB, I verified my judgment. But it is interesting that when I stacked all models, although the scores on the training set increased, but the score on LB dropped significantly. Considering the possible risk of overfitting, I abandoned the idea of stacking.    
+It can be seen that CIN performs best on the training set. After I submitted these results to the LB, I verified my judgment. But it is interesting that when I stacked all models, although the scores on the training set increased, but the score on LB dropped significantly. Considering the possible risk of overfitting, I abandoned the idea of stacking.    
 
 
 ### Focus on XdeepFM  
@@ -42,6 +40,6 @@ I started to focus on training xdeepfm. By the same method as the period, I got 
 
 So what should I trust? The cross-validation score on the training set or the Public Leaderboard?   
 
-I carefully analyzed the competition dataset. The training set has 600k rows of data and the test set has 400k rows of data. The PLB only uses 25% of the test data, which is 100k rows. When I use 5-fold cross-validation, the validation dataset for each fold is 120k rows, which is closer to the amount of data used by the PLB, and the validation score between different folds of the same model often jumps between [0.790 and 0.787]. the variance is relatively large. The most important thing is that when using the same kFold iterator (fixed KFold random seed and the number of fold, shuffle=True), the validation scores of different models have correlation, which means that some samples in the data set are difficult to train on any model, even It is impossible to train. According to this, I guess that the reason why the score of the PLB is lower than that of the k-fold CV is likely to be that the proportion of this part of the "difficult sample" in the PLB is slightly more. The total number of test data rows is similar to the train data, so the final result should be closer to the score of the k-fold CV on training set.  
+I carefully analyzed the competition dataset. The training set has 600k rows of data and the test set has 400k rows of data. The PLB only uses 25% of the test data, which is 100k rows. When I use 5-fold cross-validation, the validation dataset for each fold is 120k rows, which is closer to the amount of data used by the PLB, and the validation score between different folds of the same model often jumps between [0.790 and 0.787]. the variance is relatively large. The most important thing is that when using the same kFold iterator (fixed KFold random seed and the number of fold, shuffle=True), the validation scores of different models have correlation, which means that some samples in the data set are difficult to train on any model, even It is impossible to train. According to this, I guess that the reason why the score of the PLB is lower than the k-fold CV is likely to be that the proportion of this part of the "difficult sample" in the PLB is slightly more. The total number of test data rows is similar to the train data, so the final result should be closer to the score of the k-fold CV on training set.  
 
-Finally, I stacking CIN and xdeepfm, and improved the score on training set and PLB. Ranked 79 on the PLB. But then I believe that the final result will be closer to the score of the train set. It turns out that this guess should correct.
+Finally, I stacking CIN and xdeepfm, and improved the score on training set and PLB. The score in PLB increased to 0.78658(rank 84). But then I believe that the final result will be closer to the score of the train set. It turns out that this guess should correct.
